@@ -12,7 +12,7 @@ En el caso de Linux, abren consola (ctrl+alt+t), buscan dirección de su interé
 
 
 IMPORTANTE:
-Cada vez que quieras realizar cambios, antes de empezar a escribir, debieras hacer <<git pull>> para empezar desde una versión actualizada, para ver los cambios <<git status>>, si quieres subir todos tus cambios, debes hacer <<git add . -A>>, después <<git commit -m "mensaje">>, y por último <<git push>>
+Cada vez que quieras realizar cambios, antes de empezar a escribir, debieras hacer ```git pull``` para empezar desde una versión actualizada, para ver los cambios ```git status```, si quieres subir todos tus cambios, debes hacer ```git add . -A```, después ```git commit -m "mensaje"```, y por último ```git push```
 
 
 
