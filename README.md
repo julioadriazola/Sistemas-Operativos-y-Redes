@@ -9,6 +9,13 @@ git clone git@github.com:julioadriazola/Sistemas-Operativos-y-Redes.git
 
 En el caso de Linux, abren consola (ctrl+alt+t), buscan dirección de su interés y ejecutan la misma línea.
 
+
+
+IMPORTANTE:
+Cada vez que quieras realizar cambios, antes de empezar a escribir, debieras hacer <<git pull>> para empezar desde una versión actualizada, para ver los cambios <<git status>>, si quieres subir todos tus cambios, debes hacer <<git add . -A>>, después <<git commit -m "mensaje">>, y por último <<git push>>
+
+
+
 ¿Si quiero ver mi estado con respecto a la última versión LOCAL?
 
 git status
@@ -17,7 +24,7 @@ git status
 
 git add carpeta1/carpeta2/carpeta3/nombre_de_archivo.algo
 
-¿Si quiero agregar TODOs los archivos creados y cambiados a mi versión LOCAL?
+¿Si quiero agregar TODOS los archivos creados y cambiados a mi versión LOCAL?
 
 git add .
 
@@ -25,7 +32,7 @@ git add .
 
 git add . -A
 
-¿Y ahora, cómo hago commit a mi para respaldar mi versión LOCAL?
+¿Y ahora, cómo hago commit para respaldar mi versión LOCAL?
 
 git commit -m "Un mensaje cualquiera"
 
