@@ -10,5 +10,3 @@ class Process():
 	def getArriveTime(self):
 		return self._arrive_time
 
-a=Process("Holiiafdaií")
-print a.getArriveTime()
