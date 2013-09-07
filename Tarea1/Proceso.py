@@ -1,3 +1,7 @@
+from multiprocessing import Process
+import time
+
+
 class Proceso(object):
 
 	def __init__(self,nombre_proceso,fecha_ejecucion,tipo_proceso,prioridad_base,opciones):
@@ -6,6 +10,20 @@ class Proceso(object):
 		self.tipo_proceso = tipo_proceso
 		self.prioridad_base = prioridad_base
 		self.opciones = opciones
+
+	def getNombre(self):
+		return self.nombre_proceso
+	def getFecha(self):
+		return self.fecha_ejecucion
+	def getTipo(self):
+		return self.tipo_proceso
+	def getPrioridad(self):
+		return self.prioridad_base
+	# def getTiempo(self):
+	# 	return self.tiempo
+	# def getTiempoTotal(self):
+	# 	return self.tiempoTotal
+
 
 	def writeInfo(self):
 		print self.nombre_proceso + " " + str(self.fecha_ejecucion) + " " + str(self.tipo_proceso) + " " + str(self.prioridad_base),
@@ -70,7 +88,38 @@ def ProcessFile():
 
 
 # Lista con los procesos del archivo
+
+global tiempoMaquina
+tiempoMaquina=0
+
+
+def funcion(num,p):
+	# for x in range (0, rango[num].getFecha()):
+	# 	print str(1)+ " "+str(x)
+	# 	time.sleep(0.1)
+	global tiempoMaquina
+	ejecutandose = []
+	while(not(not p and not ejecutandose)):
+		print "holi"
+		print str(tiempoMaquina)
+		time.sleep(0.1)
+	# if(p[0].getFecha() >= tiempoMaquina):
+	# 	ejecutandose.append(p[0])
+	# 	p.pop[0]
+
+
+
 procesos = ProcessFile()
 procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
-for p in procesos:
-	p.writeInfo()
+
+p1 = Process(target=funcion , args=(1,procesos))
+p1.start()
+
+
+while(True):
+	tiempoMaquina+=1
+	print str(tiempoMaquina)
+	time.sleep(1)
+
+# for p in procesos:
+# 	p.writeInfo()
