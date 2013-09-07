@@ -8,7 +8,7 @@ class Proceso(object):
 		self.opciones = opciones
 
 	def writeInfo(self):
-		print self.nombre_proceso + " " + self.fecha_ejecucion + " " + str(self.tipo_proceso) + " " + str(self.prioridad_base),
+		print self.nombre_proceso + " " + str(self.fecha_ejecucion) + " " + str(self.tipo_proceso) + " " + str(self.prioridad_base),
 		for op in self.opciones:
 			print op,
 		print ""
@@ -63,7 +63,7 @@ def ProcessFile():
 		for x in range(4,len(partes)):
 			opciones.append(partes[x])
 		#Crear un proceso a partir de las componentes de la linea
-		p = Proceso(partes[0], partes[1], int(partes[2]), int(partes[3]), opciones)
+		p = Proceso(partes[0], int(partes[1]), int(partes[2]), int(partes[3]), opciones)
 		procesos.append(p)
 
 	return procesos
@@ -71,5 +71,6 @@ def ProcessFile():
 
 # Lista con los procesos del archivo
 procesos = ProcessFile()
+procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
 for p in procesos:
 	p.writeInfo()
