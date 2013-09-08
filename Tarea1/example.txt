@@ -1,4 +1,4 @@
-hacer_llamada;11;1;0;2277567;10
+hacer_llamada;51;1;0;2277567;10
 recibir_llamada;85;2;0;2277567;15
 recibir_mensajes;6;4;2;2277567;Hola
 recibir_mensajes;9;4;2;2277567;Alo?

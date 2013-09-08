@@ -165,47 +165,50 @@ def ProcessFile():
 
 	return procesos
 
-
+global lastconsola
 #metodo que analiza inputs en el main
 def input(consola):
     
-	
+	global lastconsola
+	#print "lastconsola " + lastconsola
+	#print "consola " + consola
+	if( (not(consola.value == lastconsola) or (lastconsola == "top"))) :
+	    try :
+	        variable = consola.value.split(";")
+	    except :
+	        pass
 
-    try :
-        variable = consola.value.split(";")
-    except :
-        pass
+		global procesos
+		global ejecutandose
 
-	global procesos
-	global ejecutandose
-
-    if(len(variable)>=5):
-        #Crear un proceso a partir de las componentes de la linea
-        print "Proceso por comando"
-        opciones = []
-        for x in range(4,len(variable)):
-            opciones.append(variable[x])
-        #Crear un proceso a partir de las componentes de la linea
-        p = Proceso(variable[0], int(variable[1]), int(variable[2]), int(variable[3]), opciones)
-        procesos.append(p)
-        print str(p.getDuracion())
-        procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
-        variable=[]
+	    if(len(variable)>=5):
+	        #Crear un proceso a partir de las componentes de la linea
+	        print "Proceso por comando"
+	        opciones = []
+	        for x in range(4,len(variable)):
+	            opciones.append(variable[x])
+	        #Crear un proceso a partir de las componentes de la linea
+	        p = Proceso(variable[0], int(variable[1]), int(variable[2]), int(variable[3]), opciones)
+	        procesos.append(p)
+	        print str(p.getDuracion())
+	        procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
+	        variable=[]
 
 
-        
+	        
 
-    elif(consola.value=="agenda"):
-        #aqui hay que imprimir la agenda y despues agregar la llamada elegida a la clase proceso
-        print "revisando agenda"
-        variable=""
-    elif(consola.value=="historial"):
-        #aqui hay que imprimir el archivo de historial de llamadas y mensajes
-        print "revisando historial"
-        variable=""
-    elif(consola.value == "top"):
-		topfunction()
+	    elif(consola.value=="agenda"):
+	        #aqui hay que imprimir la agenda y despues agregar la llamada elegida a la clase proceso
+	        print "revisando agenda"
+	        variable=""
+	    elif(consola.value=="historial"):
+	        #aqui hay que imprimir el archivo de historial de llamadas y mensajes
+	        print "revisando historial"
+	        variable=""
+	    elif(consola.value == "top"):
+			topfunction()
 
+	lastconsola = consola.value
 	
 
 
@@ -245,6 +248,8 @@ def funcion(num,p,consola):
 	procesos = ProcessFile()
 	procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
 
+	global lastconsola
+	lastconsola = ""
 	for p in procesos:
  		p.writeInfo()
 
@@ -276,7 +281,7 @@ def funcion(num,p,consola):
 				#		for j in range(0,len(ejecutandose[i])):
 				#			print str(ejecutandose[i][j].getNombre()) + str(ejecutandose[i][j].getNumCola())
 					del procesos[0]
-				# print "1"
+				#	print "1aaaaaaaaaaaaaaa"
 				if(ejecutandose[0]):
 					
 					ejecutandose[0][0].ejecutarAccion(deltaT)
