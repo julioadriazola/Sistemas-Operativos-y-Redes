@@ -132,7 +132,7 @@ class Proceso(object):
 		elif(self.tipo_proceso == 10):
 			a=2
 
-		print self.nombre_proceso + " " + str(self.duracion)
+		#print self.nombre_proceso + " " + str(self.duracion)
 
 	def isAlive(self):
 		return self.duracion>0
@@ -164,6 +164,37 @@ def ProcessFile():
 	return procesos
 
 
+#metodo que analiza inputs en el main
+def input(consola,procesos,ejecutandose):
+    
+    try :
+        variable = consola.value.split(";")
+    except :
+        pass
+
+    if(len(variable)>=5):
+        #Crear un proceso a partir de las componentes de la linea
+        print "Proceso por comando"
+        opciones = []
+        for x in range(4,len(variable)):
+            opciones.append(variable[x])
+        #Crear un proceso a partir de las componentes de la linea
+        p = Proceso(variable[0], int(variable[1]), int(variable[2]), int(variable[3]), opciones)
+        procesos.append(p)
+
+    elif(consola.value=="agenda"):
+        #aqui hay que imprimir la agenda y despues agregar la llamada elegida a la clase proceso
+        print "revisando agenda"
+
+    elif(consola.value=="historial"):
+        #aqui hay que imprimir el archivo de historial de llamadas y mensajes
+        print "revisando historial"
+    elif(consola.value == "top"):
+		topfunction(ejecutandose)
+
+
+
+
 def topfunction(ejecutandose):
 	print "Procesos Ejecutandose :"
 	if(ejecutandose[0]):
@@ -177,11 +208,15 @@ def topfunction(ejecutandose):
 		print "Running: "
 		for i in range(0,len(ejecutandose[1])):
 			print str(ejecutandose[1][i].getNombre()) + str(ejecutandose[1][i].getNumCola())
+
 		print "Waiting: "
-		for i in range(1,2):
-			for j in range(1,len(ejecutandose[i])):
-				print str(ejecutandose[i][j].getNombre()) + str(ejecutandose[i][j].getNumCola())
-				
+		for j in range(0,len(ejecutandose[2])):
+			print str(ejecutandose[2][j].getNombre()) + str(ejecutandose[2][j].getNumCola())
+
+	else:
+		print "Running: "
+		for j in range(0,len(ejecutandose[2])):
+			print str(ejecutandose[2][j].getNombre()) + str(ejecutandose[2][j].getNumCola())
 
 
 
@@ -202,9 +237,11 @@ def funcion(num,p,consola):
 	deltaT=0.5
 
 	while(True):
+
+		input(consola,procesos,ejecutandose)
+
 		#print str(consola.value)
-		if(consola.value == "top"):
-			topfunction(ejecutandose)
+		
 		# for p in procesos:
 		# 	p.writeInfo()
 		for x in range(0,int(1/deltaT)):
