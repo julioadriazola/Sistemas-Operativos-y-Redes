@@ -1,6 +1,15 @@
 from multiprocessing import Process
 import time
+import math
 
+# Falta:
+# 1 - Calcular duracion
+# 2 - Arreglar ejecutar Accion
+# 	2.1 - Con manejo de archivos
+# 	2.2 - Sin manejo de archivos
+# 3 - Top
+# 4 - Ejecutar comando
+# 5 - Consultar Agenda y Revisar historial de llamadas y SMS
 
 class Proceso(object):
 
@@ -16,7 +25,39 @@ class Proceso(object):
 			self.numCola=2
 		self.prioridad_base = prioridad_base
 		self.opciones = opciones
-		self.duracion = 5
+
+		#Llamada
+		if( tipo_proceso == 1 or tipo_proceso == 2):
+			self.duracion = int(opciones[1])
+			self.numeroTelefono = opciones[0]
+		#Mensaje 
+		elif( tipo_proceso == 3 or tipo_proceso == 4):
+			self.duracion = int(math.ceil(len(self.opciones[1]) * 0.020))
+			if(tipo_proceso == 3):
+				self.receptor = opciones[0]
+			elif(tipo_proceso == 4):
+				self.emisor = opciones[0]
+		#AgregarContacto
+		elif( tipo_proceso == 5):
+			self.duracion = 1
+		#Procesos Cualquiera
+		elif ( tipo_proceso == 6):
+			self.duracion = int(opciones[0])
+		#Mandar Ubicacion
+		elif( tipo_proceso == 7):
+			self.duracion = 2
+		#Ver ubicacion
+		elif (tipo_proceso == 8):
+			self.duracion = int(opciones[0])
+		#Jugar
+		elif (tipo_proceso == 9):
+			self.duracion = int(opciones[0])
+		#Musica
+		elif(tipo_proceso == 10):
+			self.duracion = int(opciones[0])
+
+
+
 
 	def getNombre(self):
 		return self.nombre_proceso
