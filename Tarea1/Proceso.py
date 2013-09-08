@@ -8,8 +8,15 @@ class Proceso(object):
 		self.nombre_proceso = nombre_proceso
 		self.fecha_ejecucion = fecha_ejecucion
 		self.tipo_proceso = tipo_proceso
+		if(tipo_proceso == 1 or tipo_proceso == 2):
+			self.numCola=0
+		elif(tipo_proceso == 3 or tipo_proceso == 4):
+			self.numCola=1
+		else:
+			self.numCola=2
 		self.prioridad_base = prioridad_base
 		self.opciones = opciones
+		self.duracion = 5
 
 	def getNombre(self):
 		return self.nombre_proceso
@@ -19,10 +26,8 @@ class Proceso(object):
 		return self.tipo_proceso
 	def getPrioridad(self):
 		return self.prioridad_base
-	# def getTiempo(self):
-	# 	return self.tiempo
-	# def getTiempoTotal(self):
-	# 	return self.tiempoTotal
+	def getNumCola(self):
+		return self.numCola
 
 
 	def writeInfo(self):
@@ -61,6 +66,38 @@ class Proceso(object):
 				f.write(self.opciones[1])
 		finally:
 			f.close()
+
+	def ejecutarAccion(self,delta):
+		if(self.duracion>0):
+			self.duracion-=delta
+
+		if(self.tipo_proceso == 1):
+			a=1
+		elif(self.tipo_proceso == 2):
+			a=2
+		elif(self.tipo_proceso == 3):
+			a=2
+		elif(self.tipo_proceso == 4):
+			a=2
+		elif(self.tipo_proceso == 5):
+			a=2
+		elif(self.tipo_proceso == 6):
+			a=2
+		elif(self.tipo_proceso == 7):
+			a=2
+		elif(self.tipo_proceso == 8):
+			a=2
+		elif(self.tipo_proceso == 9):
+			a=2
+		elif(self.tipo_proceso == 10):
+			a=2
+
+		print self.nombre_proceso + " " + str(self.duracion)
+
+	def isAlive(self):
+		return self.duracion>0
+
+
 	
 	
 def ProcessFile():
@@ -108,18 +145,54 @@ def funcion(num,p):
 	# 	p.pop[0]
 
 
-
 procesos = ProcessFile()
 procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
 
-p1 = Process(target=funcion , args=(1,procesos))
-p1.start()
 
+
+# p1 = Process(target=funcion , args=(1,procesos))
+# p1.start()
+
+ejecutandose = [[],[],[]]
+
+deltaT=0.5
 
 while(True):
+	# for p in procesos:
+	# 	p.writeInfo()
+	for x in range(0,int(1/deltaT)):
+		if(procesos or ejecutandose):
+			# Si hay elentos que agregar a ejecutando
+			# if(procesos):
+				# print str(procesos[0].getFecha())
+			while(procesos and procesos[0].getFecha() <= tiempoMaquina):
+				ejecutandose[procesos[0].getNumCola()].append(procesos[0])
+				del procesos[0]
+			# print "1"
+			if(ejecutandose[0]):
+				ejecutandose[0][0].ejecutarAccion(deltaT)
+				if (not ejecutandose[0][0].isAlive()):
+					del ejecutandose[0][0]
+
+
+			elif(ejecutandose[1]):
+				ejecutandose[1][0].ejecutarAccion(deltaT)
+				if (ejecutandose[1][0].isAlive()):
+					ejecutandose[1].append(ejecutandose[1][0])
+				del ejecutandose[1][0]
+
+
+			elif(ejecutandose[2]):
+				ejecutandose[2][0].ejecutarAccion(deltaT)
+				if (ejecutandose[2][0].isAlive()):
+					ejecutandose[2].append(ejecutandose[2][0])
+				del ejecutandose[2][0]
+
+		time.sleep(deltaT)
+
 	tiempoMaquina+=1
 	print str(tiempoMaquina)
-	time.sleep(1)
+
 
 # for p in procesos:
 # 	p.writeInfo()
