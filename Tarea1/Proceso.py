@@ -1,4 +1,5 @@
-from multiprocessing import Process, Value, Array
+from multiprocessing import Process, Lock
+from multiprocessing.sharedctypes import Value, Array
 import time
 import math
 
@@ -7,7 +8,6 @@ import math
 # 	2.1 - Con manejo de archivos
 # 	2.2 - Sin manejo de archivos
 # 3 - Top
-# 4 - Ejecutar comando
 # 5 - Consultar Agenda y Revisar historial de llamadas y SMS
 
 class Proceso(object):
@@ -164,12 +164,17 @@ def ProcessFile():
 	return procesos
 
 
-# Lista con los procesos del archivo
+def topfunction(ejecutandose):
+	print "Procesos Ejecutandose :"
+	for i in range(0,3):
+		for j in range(0,len(ejecutandose[i]):
 
 
 
 
-def funcion(num,p):
+
+
+def funcion(num,p,consola):
 	global tiempoMaquina
 	tiempoMaquina=0
 	procesos = ProcessFile()
@@ -185,6 +190,7 @@ def funcion(num,p):
 	deltaT=0.5
 
 	while(True):
+		print str(consola.value)
 		# for p in procesos:
 		# 	p.writeInfo()
 		for x in range(0,int(1/deltaT)):
@@ -221,13 +227,16 @@ def funcion(num,p):
 		print str(tiempoMaquina)
 
 
-p1 = Process(target=funcion, args=(1,100))
+
+consola = Array('c', 'holaholahola')	
+
+p1 = Process(target=funcion, args=(1,100,consola))
 p1.start()
 
 texto = ""
 while(texto <> "s"):
 	texto = raw_input("")
+	consola.value = 'chaooo'
 	print texto + "oliafadgwhtjefjdlgkdsgkgsjkfghjskfghskfhghsfkghsfkj"
-p1.terminate()
 # for p in procesos:
 # 	p.writeInfo()
