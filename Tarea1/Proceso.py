@@ -1,9 +1,8 @@
-from multiprocessing import Process
+from multiprocessing import Process, Value, Array
 import time
 import math
 
 # Falta:
-# 1 - Calcular duracion
 # 2 - Arreglar ejecutar Accion
 # 	2.1 - Con manejo de archivos
 # 	2.2 - Sin manejo de archivos
@@ -167,73 +166,68 @@ def ProcessFile():
 
 # Lista con los procesos del archivo
 
-global tiempoMaquina
-tiempoMaquina=0
+
 
 
 def funcion(num,p):
-	# for x in range (0, rango[num].getFecha()):
-	# 	print str(1)+ " "+str(x)
-	# 	time.sleep(0.1)
 	global tiempoMaquina
-	ejecutandose = []
-	while(not(not p and not ejecutandose)):
-		print "holi"
+	tiempoMaquina=0
+	procesos = ProcessFile()
+	procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
+
+
+
+	# p1 = Process(target=funcion , args=(1,procesos))
+	# p1.start()
+
+	ejecutandose = [[],[],[]]
+
+	deltaT=0.5
+
+	while(True):
+		# for p in procesos:
+		# 	p.writeInfo()
+		for x in range(0,int(1/deltaT)):
+			if(procesos or ejecutandose):
+				# Si hay elentos que agregar a ejecutando
+				# if(procesos):
+					# print str(procesos[0].getFecha())
+				while(procesos and procesos[0].getFecha() <= tiempoMaquina):
+					ejecutandose[procesos[0].getNumCola()].append(procesos[0])
+					del procesos[0]
+				# print "1"
+				if(ejecutandose[0]):
+					ejecutandose[0][0].ejecutarAccion(deltaT)
+					if (not ejecutandose[0][0].isAlive()):
+						del ejecutandose[0][0]
+
+
+				elif(ejecutandose[1]):
+					ejecutandose[1][0].ejecutarAccion(deltaT)
+					if (ejecutandose[1][0].isAlive()):
+						ejecutandose[1].append(ejecutandose[1][0])
+					del ejecutandose[1][0]
+
+
+				elif(ejecutandose[2]):
+					ejecutandose[2][0].ejecutarAccion(deltaT)
+					if (ejecutandose[2][0].isAlive()):
+						ejecutandose[2].append(ejecutandose[2][0])
+					del ejecutandose[2][0]
+
+			time.sleep(deltaT)
+
+		tiempoMaquina+=1
 		print str(tiempoMaquina)
-		time.sleep(0.1)
-	# if(p[0].getFecha() >= tiempoMaquina):
-	# 	ejecutandose.append(p[0])
-	# 	p.pop[0]
 
 
-procesos = ProcessFile()
-procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
+p1 = Process(target=funcion, args=(1,100))
+p1.start()
 
-
-
-# p1 = Process(target=funcion , args=(1,procesos))
-# p1.start()
-
-ejecutandose = [[],[],[]]
-
-deltaT=0.5
-
-while(True):
-	# for p in procesos:
-	# 	p.writeInfo()
-	for x in range(0,int(1/deltaT)):
-		if(procesos or ejecutandose):
-			# Si hay elentos que agregar a ejecutando
-			# if(procesos):
-				# print str(procesos[0].getFecha())
-			while(procesos and procesos[0].getFecha() <= tiempoMaquina):
-				ejecutandose[procesos[0].getNumCola()].append(procesos[0])
-				del procesos[0]
-			# print "1"
-			if(ejecutandose[0]):
-				ejecutandose[0][0].ejecutarAccion(deltaT)
-				if (not ejecutandose[0][0].isAlive()):
-					del ejecutandose[0][0]
-
-
-			elif(ejecutandose[1]):
-				ejecutandose[1][0].ejecutarAccion(deltaT)
-				if (ejecutandose[1][0].isAlive()):
-					ejecutandose[1].append(ejecutandose[1][0])
-				del ejecutandose[1][0]
-
-
-			elif(ejecutandose[2]):
-				ejecutandose[2][0].ejecutarAccion(deltaT)
-				if (ejecutandose[2][0].isAlive()):
-					ejecutandose[2].append(ejecutandose[2][0])
-				del ejecutandose[2][0]
-
-		time.sleep(deltaT)
-
-	tiempoMaquina+=1
-	print str(tiempoMaquina)
-
-
+texto = ""
+while(texto <> "s"):
+	texto = raw_input("")
+	print texto + "oliafadgwhtjefjdlgkdsgkgsjkfghjskfghskfhghsfkghsfkj"
+p1.terminate()
 # for p in procesos:
 # 	p.writeInfo()
