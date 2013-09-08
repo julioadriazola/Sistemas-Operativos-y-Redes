@@ -68,7 +68,8 @@ class Proceso(object):
 		return self.prioridad_base
 	def getNumCola(self):
 		return self.numCola
-
+	def getDuracion(self):
+		print self.duracion
 
 	def writeInfo(self):
 		print self.nombre_proceso + " " + str(self.fecha_ejecucion) + " " + str(self.tipo_proceso) + " " + str(self.prioridad_base),
@@ -137,9 +138,10 @@ class Proceso(object):
 	def isAlive(self):
 		return self.duracion>0
 
+global ejecutandose
+global procesos
 
-	
-	
+
 def ProcessFile():
 	#Leer el archivo y guardar sus lineas en la lista "lines"
 	f = open("example.txt","r")
@@ -165,12 +167,17 @@ def ProcessFile():
 
 
 #metodo que analiza inputs en el main
-def input(consola,procesos,ejecutandose):
+def input(consola):
     
+	
+
     try :
         variable = consola.value.split(";")
     except :
         pass
+
+	global procesos
+	global ejecutandose
 
     if(len(variable)>=5):
         #Crear un proceso a partir de las componentes de la linea
@@ -181,27 +188,37 @@ def input(consola,procesos,ejecutandose):
         #Crear un proceso a partir de las componentes de la linea
         p = Proceso(variable[0], int(variable[1]), int(variable[2]), int(variable[3]), opciones)
         procesos.append(p)
+        print str(p.getDuracion())
+        procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
+        variable=[]
+
+
+        
 
     elif(consola.value=="agenda"):
         #aqui hay que imprimir la agenda y despues agregar la llamada elegida a la clase proceso
         print "revisando agenda"
-
+        variable=""
     elif(consola.value=="historial"):
         #aqui hay que imprimir el archivo de historial de llamadas y mensajes
         print "revisando historial"
+        variable=""
     elif(consola.value == "top"):
-		topfunction(ejecutandose)
+		topfunction()
+
+	
 
 
 
+def topfunction():
 
-def topfunction(ejecutandose):
+	global ejecutandose
 	print "Procesos Ejecutandose :"
 	if(ejecutandose[0]):
 		print "Running: " + str(ejecutandose[0][0].getNombre())
 		print "Waiting: "
 		for i in range(1,3):
-			for j in range(1,len(ejecutandose[i])):
+			for j in range(0,len(ejecutandose[i])):
 				print str(ejecutandose[i][j].getNombre()) + str(ejecutandose[i][j].getNumCola())
 
 	elif(ejecutandose[1]):
@@ -224,42 +241,51 @@ def topfunction(ejecutandose):
 def funcion(num,p,consola):
 	global tiempoMaquina
 	tiempoMaquina=0
+	global procesos
 	procesos = ProcessFile()
 	procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
 
+	for p in procesos:
+ 		p.writeInfo()
 
 
 	# p1 = Process(target=funcion , args=(1,procesos))
 	# p1.start()
-
+	global ejecutandose
 	ejecutandose = [[],[],[]]
 
 	deltaT=0.5
 
 	while(True):
 
-		input(consola,procesos,ejecutandose)
+		#input(consola,procesos,ejecutandose)
 
 		#print str(consola.value)
 		
 		# for p in procesos:
 		# 	p.writeInfo()
 		for x in range(0,int(1/deltaT)):
+			input(consola)
 			if(procesos or ejecutandose):
 				# Si hay elentos que agregar a ejecutando
 				# if(procesos):
 					# print str(procesos[0].getFecha())
 				while(procesos and procesos[0].getFecha() <= tiempoMaquina):
 					ejecutandose[procesos[0].getNumCola()].append(procesos[0])
+				#	for i in range(0,3):
+				#		for j in range(0,len(ejecutandose[i])):
+				#			print str(ejecutandose[i][j].getNombre()) + str(ejecutandose[i][j].getNumCola())
 					del procesos[0]
 				# print "1"
 				if(ejecutandose[0]):
+					
 					ejecutandose[0][0].ejecutarAccion(deltaT)
 					if (not ejecutandose[0][0].isAlive()):
 						del ejecutandose[0][0]
 
 
 				elif(ejecutandose[1]):
+
 					ejecutandose[1][0].ejecutarAccion(deltaT)
 					if (ejecutandose[1][0].isAlive()):
 						ejecutandose[1].append(ejecutandose[1][0])
@@ -279,7 +305,7 @@ def funcion(num,p,consola):
 
 
 
-consola = Array('c', 'holaholahola')	
+consola = Array('c', 'oliafadgwhtjefjdlgkdsgkgsjkfghjskfghskfhghsfkghsfkjoliafadgwhtjefjdlgkdsgkgsjkfghjskfghskfhghsfkghsfkj')	
 
 p1 = Process(target=funcion, args=(1,100,consola))
 p1.start()
@@ -291,3 +317,4 @@ while(texto <> "s"):
 	print texto + "oliafadgwhtjefjdlgkdsgkgsjkfghjskfghskfhghsfkghsfkj"
 # for p in procesos:
 # 	p.writeInfo()
+
