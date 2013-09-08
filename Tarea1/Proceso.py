@@ -166,10 +166,22 @@ def ProcessFile():
 
 def topfunction(ejecutandose):
 	print "Procesos Ejecutandose :"
-	for i in range(0,3):
-		for j in range(0,len(ejecutandose[i]):
+	if(ejecutandose[0]):
+		print "Running: " + str(ejecutandose[0][0].getNombre())
+		print "Waiting: "
+		for i in range(1,3):
+			for j in range(1,len(ejecutandose[i])):
+				print str(ejecutandose[i][j].getNombre()) + str(ejecutandose[i][j].getNumCola())
 
-
+	elif(ejecutandose[1]):
+		print "Running: "
+		for i in range(0,len(ejecutandose[1])):
+			print str(ejecutandose[1][i].getNombre()) + str(ejecutandose[1][i].getNumCola())
+		print "Waiting: "
+		for i in range(1,2):
+			for j in range(1,len(ejecutandose[i])):
+				print str(ejecutandose[i][j].getNombre()) + str(ejecutandose[i][j].getNumCola())
+				
 
 
 
@@ -190,7 +202,9 @@ def funcion(num,p,consola):
 	deltaT=0.5
 
 	while(True):
-		print str(consola.value)
+		#print str(consola.value)
+		if(consola.value == "top"):
+			topfunction(ejecutandose)
 		# for p in procesos:
 		# 	p.writeInfo()
 		for x in range(0,int(1/deltaT)):
@@ -236,7 +250,7 @@ p1.start()
 texto = ""
 while(texto <> "s"):
 	texto = raw_input("")
-	consola.value = 'chaooo'
+	consola.value = texto
 	print texto + "oliafadgwhtjefjdlgkdsgkgsjkfghjskfghskfhghsfkghsfkj"
 # for p in procesos:
 # 	p.writeInfo()
