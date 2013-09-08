@@ -95,7 +95,7 @@ class Proceso(object):
 			data = self.opciones[0] +'\t'+ 'Fecha: ' + str(self.fecha_ejecucion) +'\t'+ 'Duracion: ' + self.opciones[1] +'\n'
 			if (not(self.lasth) or not(self.lasth == llamada+data)):
 				try:
-					fh = open("./Documents/Historial.txt", "a")
+					fh = open("Historial.txt", "a")
 					fh.write(llamada+data)
 				finally:
 					fh.close()
@@ -107,7 +107,7 @@ class Proceso(object):
 				sms = 'Mensaje recibido de: ' +'\t'+ self.opciones[0] +'\t'+ 'Fecha: ' + str(self.fecha_ejecucion) +'\n' + self.opciones[1] + '\n'
 			if(not(self.lasts) or not (self.lasts == sms)):
 				try:
-					fs = open("./Documents/SMS.txt", "a")
+					fs = open("SMS.txt", "a")
 					fs.write(sms)
 				finally:
 					fs.close()
@@ -127,7 +127,7 @@ class Proceso(object):
 				accion = 'Escuchar musica' +'\t'+'\t'+ 'Duracion: '+ self.opciones[0] +'\n'
 			if(not(self.lastp) or not(self.lastp == accion)):
 				try:
-					fp = open("./Documents/Procesos.txt", "a")
+					fp = open("Procesos.txt", "a")
 					fp.write(accion)
 				finally:
 					fp.close()
