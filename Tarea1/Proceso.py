@@ -24,6 +24,11 @@ class Proceso(object):
 			self.numCola=2
 		self.prioridad_base = prioridad_base
 		self.opciones = opciones
+		
+		#variables para escritura de memoria
+		self.lasth = ''
+		self.lastp = ''
+		self.lasts = ''
 
 		#Llamada
 		if( tipo_proceso == 1 or tipo_proceso == 2):
@@ -76,64 +81,59 @@ class Proceso(object):
 		for op in self.opciones:
 			print op,
 		print ""
-		
-		
-	def callData(self):
-		if self.tipo_proceso == 1:
-			llamada = 'Llamada hecha: '
-		else:
-			llamada = 'Llamada recibida: '
 
-		data = self.opciones[0] + ' Fecha: ' + self.fecha_ejecucion + ' Duracion: ' + self.opciones[1],
-
-		try:
-			f = open("Historial.txt", "a")
-			f.write(llamada)
-		finally:
-			f.close()
-
-	def smsData(self):
-		tiempo = self.opciones[1].count() * 0.020
-
-		if self.tipo_proceso == 3:
-			sms = 'Mensaje enviado a: ' + self.opciones[0],
-		else:
-			sms = 'Mensaje recibido de: ' + self.opciones[0],
-
-		try:
-			f = open("SMS.txt", "a")
-			f.write(sms)
-			if self.tipo_proceso == 4:
-				f.write(self.opciones[1])
-		finally:
-			f.close()
 
 	def ejecutarAccion(self,delta):
 		if(self.duracion>0):
 			self.duracion-=delta
 
-		if(self.tipo_proceso == 1):
-			a=1
-		elif(self.tipo_proceso == 2):
-			a=2
-		elif(self.tipo_proceso == 3):
-			a=2
-		elif(self.tipo_proceso == 4):
-			a=2
-		elif(self.tipo_proceso == 5):
-			a=2
-		elif(self.tipo_proceso == 6):
-			a=2
-		elif(self.tipo_proceso == 7):
-			a=2
-		elif(self.tipo_proceso == 8):
-			a=2
-		elif(self.tipo_proceso == 9):
-			a=2
-		elif(self.tipo_proceso == 10):
-			a=2
-
-		#print self.nombre_proceso + " " + str(self.duracion)
+		if(self.tipo_proceso == 1 or self.tipo_proceso == 2):
+			if self.tipo_proceso == 1:
+				llamada = 'Llamada hecha a: '
+			else:
+				llamada = 'Llamada recibida de: '
+			data = self.opciones[0] +'\t'+ 'Fecha: ' + str(self.fecha_ejecucion) +'\t'+ 'Duracion: ' + self.opciones[1] +'\n'
+			if (not(self.lasth) or not(self.lasth == llamada+data)):
+				try:
+					fh = open("./Documents/Historial.txt", "a")
+					fh.write(llamada+data)
+				finally:
+					fh.close()
+			self.lasth = llamada+data
+		elif(self.tipo_proceso == 3 or self.tipo_proceso == 4):
+			if self.tipo_proceso == 3:
+				sms = 'Mensaje enviado a: ' +'\t'+ self.opciones[0] +'\t'+ 'Fecha: ' + str(self.fecha_ejecucion) +'\n'
+			else:
+				sms = 'Mensaje recibido de: ' +'\t'+ self.opciones[0] +'\t'+ 'Fecha: ' + str(self.fecha_ejecucion) +'\n' + self.opciones[1] + '\n'
+			if(not(self.lasts) or not (self.lasts == sms)):
+				try:
+					fs = open("./Documents/SMS.txt", "a")
+					fs.write(sms)
+				finally:
+					fs.close()
+			self.lasts = sms
+		elif(self.tipo_proceso >= 5 and self.tipo_proceso <= 10):
+			if(self.tipo_proceso == 5):
+				accion = 'Agregar Contacto: ' + self.opciones[0] +'\t'+'\t'+ 'Numero: ' + self.opciones[1] +'\n'
+			elif(self.tipo_proceso == 6):
+				accion = 'Proceso Cualquiera' +'\t'+'\t'+ 'Duracion: '+ self.opciones[0] +'\n'
+			elif(self.tipo_proceso == 7):
+				accion = 'Mandar ubicacion'+'\t'+'\t'+ 'Duracion: '+ self.opciones[0] +'\n'
+			elif(self.tipo_proceso == 8):
+				accion = 'Ver ubicacion'+'\t'+'\t'+ 'Duracion: '+ self.opciones[0] +'\n'
+			elif(self.tipo_proceso == 9):
+				accion = 'Jugar'+'\t'+'\t'+ 'Duracion: '+ self.opciones[0] +'\n'
+			elif(self.tipo_proceso == 10):
+				accion = 'Escuchar musica' +'\t'+'\t'+ 'Duracion: '+ self.opciones[0] +'\n'
+			if(not(self.lastp) or not(self.lastp == accion)):
+				try:
+					fp = open("./Documents/Procesos.txt", "a")
+					fp.write(accion)
+				finally:
+					fp.close()
+			self.lastp = accion
+			
+			
 
 	def isAlive(self):
 		return self.duracion>0
