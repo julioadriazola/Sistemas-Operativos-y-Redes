@@ -1,0 +1,20 @@
+Agregar Contacto: Diego Alvarez		Numero: 2277567
+Jugar		Duracion: 60
+Escuchar musica		Duracion: 30
+Agregar Contacto: Diego Alvarez		Numero: 2277567
+Jugar		Duracion: 60
+Escuchar musica		Duracion: 30
+Agregar Contacto: Diego Alvarez		Numero: 2277567
+Jugar		Duracion: 60
+Escuchar musica		Duracion: 30
+Agregar Contacto: Diego Alvarez		Numero: 2277567
+Jugar		Duracion: 60
+Agregar Contacto: Diego Alvarez		Numero: 2277567
+Jugar		Duracion: 60
+Escuchar musica		Duracion: 30
+Agregar Contacto: Diego Alvarez		Numero: 2277567
+Jugar		Duracion: 60
+Escuchar musica		Duracion: 30
+Agregar Contacto: Diego Alvarez		Numero: 2277567
+Jugar		Duracion: 60
+Escuchar musica		Duracion: 30

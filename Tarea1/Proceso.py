@@ -2,13 +2,10 @@ from multiprocessing import Process, Lock
 from multiprocessing.sharedctypes import Value, Array
 import time
 import math
-
-# Falta:
-# 2 - Arreglar ejecutar Accion
-# 	2.1 - Con manejo de archivos
-# 	2.2 - Sin manejo de archivos
-# 3 - Top
-# 5 - Consultar Agenda y Revisar historial de llamadas y SMS
+import sys
+import datetime
+import time
+import random
 
 class Proceso(object):
 
@@ -92,22 +89,22 @@ class Proceso(object):
 				llamada = 'Llamada hecha a: '
 			else:
 				llamada = 'Llamada recibida de: '
-			data = self.opciones[0] +'\t'+ 'Fecha: ' + str(self.fecha_ejecucion) +'\t'+ 'Duracion: ' + self.opciones[1] +'\n'
+			data = self.opciones[0] +'\t'+ 'Fecha: ' + str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)) +'\t'+ 'Duracion: ' + self.opciones[1] +'\n'
 			if (not(self.lasth) or not(self.lasth == llamada+data)):
 				try:
-					fh = open("./Documents/Historial.txt", "a")
+					fh = open("Historial.txt", "a")
 					fh.write(llamada+data)
 				finally:
 					fh.close()
 			self.lasth = llamada+data
 		elif(self.tipo_proceso == 3 or self.tipo_proceso == 4):
 			if self.tipo_proceso == 3:
-				sms = 'Mensaje enviado a: ' +'\t'+ self.opciones[0] +'\t'+ 'Fecha: ' + str(self.fecha_ejecucion) +'\n'
+				sms = 'Mensaje enviado a: ' +'\t'+ self.opciones[0] +'\t'+ 'Fecha: ' + str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)) +'\n'
 			else:
-				sms = 'Mensaje recibido de: ' +'\t'+ self.opciones[0] +'\t'+ 'Fecha: ' + str(self.fecha_ejecucion) +'\n' + self.opciones[1] + '\n'
+				sms = 'Mensaje recibido de: ' +'\t'+ self.opciones[0] +'\t'+ 'Fecha: ' + str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)) +'\n' + self.opciones[1] + '\n'
 			if(not(self.lasts) or not (self.lasts == sms)):
 				try:
-					fs = open("./Documents/SMS.txt", "a")
+					fs = open("SMS.txt", "a")
 					fs.write(sms)
 				finally:
 					fs.close()
@@ -127,7 +124,7 @@ class Proceso(object):
 				accion = 'Escuchar musica' +'\t'+'\t'+ 'Duracion: '+ self.opciones[0] +'\n'
 			if(not(self.lastp) or not(self.lastp == accion)):
 				try:
-					fp = open("./Documents/Procesos.txt", "a")
+					fp = open("Procesos.txt", "a")
 					fp.write(accion)
 				finally:
 					fp.close()
@@ -144,6 +141,7 @@ global procesos
 
 def ProcessFile():
 	#Leer el archivo y guardar sus lineas en la lista "lines"
+	global tiempoZero
 	f = open("example.txt","r")
 	lines = f.readlines()
 	f.close()
@@ -160,7 +158,7 @@ def ProcessFile():
 		for x in range(4,len(partes)):
 			opciones.append(partes[x])
 		#Crear un proceso a partir de las componentes de la linea
-		p = Proceso(partes[0], int(partes[1]), int(partes[2]), int(partes[3]), opciones)
+		p = Proceso(partes[0], int(partes[1])+tiempoZero, int(partes[2]), int(partes[3]), opciones)
 		procesos.append(p)
 
 	return procesos
@@ -180,6 +178,7 @@ def input(consola):
 
 		global procesos
 		global ejecutandose
+		global tiempoMaquina
 
 	    if(len(variable)>=5):
 	        #Crear un proceso a partir de las componentes de la linea
@@ -188,26 +187,72 @@ def input(consola):
 	        for x in range(4,len(variable)):
 	            opciones.append(variable[x])
 	        #Crear un proceso a partir de las componentes de la linea
-	        p = Proceso(variable[0], int(variable[1]), int(variable[2]), int(variable[3]), opciones)
+	        p = Proceso(variable[0], int(variable[1])+tiempoMaquina, int(variable[2]), int(variable[3]), opciones)
 	        procesos.append(p)
 	        print str(p.getDuracion())
 	        procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
 	        variable=[]
 
 
-	        
-
+	    elif(consola.value == "salir"):
+			sys.exit(0)
 	    elif(consola.value=="agenda"):
+	        print "Agenda"
+	        f = open("Procesos.txt","r")
+	        lines = f.readlines()
+	        f.close()
+
+	        i=0
+	        for l in range(0,len(lines)):
+
+	        	if (lines[l][0:16]=="Agregar Contacto"):
+	        		linea=lines[l].strip()
+	        		print "call "+str(i)+": "+linea.split('\t')[0][18:]+": "+linea.split('\t')[2][8:]
+	        		i+=1
 	        #aqui hay que imprimir la agenda y despues agregar la llamada elegida a la clase proceso
-	        print "revisando agenda"
 	        variable=""
 	    elif(consola.value=="historial"):
 	        #aqui hay que imprimir el archivo de historial de llamadas y mensajes
-	        print "revisando historial"
+	        print "Historial de Mensajes"
+	        f = open("SMS.txt","r")
+	        lines = f.readlines()
+	        f.close()
+
+	        for l in range(0,len(lines)):
+	        	print lines[l].strip()
+
+	        print "Historial de Llamadas"
+	        f = open("Historial.txt","r")
+	        lines = f.readlines()
+	        f.close()
+
+	        for l in range(0,len(lines)):
+	        	print lines[l].strip()
+
 	        variable=""
 	    elif(consola.value == "top"):
 			topfunction()
+	    elif(consola.value[0:4] == "call"):
+			opcion = int(consola.value[5:].strip())
 
+			f = open("Procesos.txt","r")
+			lines = f.readlines()
+			f.close()
+
+			i=0
+			for l in range(0,len(lines)):
+
+				if (lines[l][0:16]=="Agregar Contacto"):
+					if(opcion==i):
+						linea=lines[l].strip()
+						opciones = []
+						opciones.append(linea.split('\t')[2][8:])
+						opciones.append(str(random.randrange(1,15)))
+						# opciones.append(str(10))
+						p = Proceso("hacer_llamada",tiempoMaquina,1, 0,opciones)
+						procesos.append(p)
+						procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion)
+					i+=1
 	lastconsola = consola.value
 	
 
@@ -216,42 +261,45 @@ def input(consola):
 def topfunction():
 
 	global ejecutandose
-	print "Procesos Ejecutandose :"
+	print "Lista de procesos"
+	print "Nombre | Prioridad"
 	if(ejecutandose[0]):
 		print "Running: " + str(ejecutandose[0][0].getNombre())
 		print "Waiting: "
 		for i in range(1,3):
 			for j in range(0,len(ejecutandose[i])):
-				print str(ejecutandose[i][j].getNombre()) + str(ejecutandose[i][j].getNumCola())
+				print str(ejecutandose[i][j].getNombre()) + " | " +str(ejecutandose[i][j].getNumCola())
 
 	elif(ejecutandose[1]):
 		print "Running: "
 		for i in range(0,len(ejecutandose[1])):
-			print str(ejecutandose[1][i].getNombre()) + str(ejecutandose[1][i].getNumCola())
+			print str(ejecutandose[1][i].getNombre()) + " | " +str(ejecutandose[1][i].getNumCola())
 
 		print "Waiting: "
 		for j in range(0,len(ejecutandose[2])):
-			print str(ejecutandose[2][j].getNombre()) + str(ejecutandose[2][j].getNumCola())
+			print str(ejecutandose[2][j].getNombre()) + " | " +str(ejecutandose[2][j].getNumCola())
 
 	else:
 		print "Running: "
 		for j in range(0,len(ejecutandose[2])):
-			print str(ejecutandose[2][j].getNombre()) + str(ejecutandose[2][j].getNumCola())
+			print str(ejecutandose[2][j].getNombre()) + " | " +str(ejecutandose[2][j].getNumCola())
 
 
 
 
 def funcion(num,p,consola):
 	global tiempoMaquina
-	tiempoMaquina=0
+	global tiempoZero
+	tiempoZero=int(time.mktime(datetime.datetime.now().timetuple()))
+	tiempoMaquina=tiempoZero
 	global procesos
 	procesos = ProcessFile()
 	procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion) 
 
 	global lastconsola
 	lastconsola = ""
-	for p in procesos:
- 		p.writeInfo()
+	# for p in procesos:
+ 		# p.writeInfo()
 
 
 	# p1 = Process(target=funcion , args=(1,procesos))
@@ -306,7 +354,7 @@ def funcion(num,p,consola):
 			time.sleep(deltaT)
 
 		tiempoMaquina+=1
-		print str(tiempoMaquina)
+		print "Tiempo: "+str(datetime.datetime.fromtimestamp(tiempoMaquina))
 
 
 
@@ -316,10 +364,9 @@ p1 = Process(target=funcion, args=(1,100,consola))
 p1.start()
 
 texto = ""
-while(texto <> "s"):
+while(texto <> "salir"):
 	texto = raw_input("")
 	consola.value = texto
-	print texto + "oliafadgwhtjefjdlgkdsgkgsjkfghjskfghskfhghsfkghsfkj"
 # for p in procesos:
 # 	p.writeInfo()
 
