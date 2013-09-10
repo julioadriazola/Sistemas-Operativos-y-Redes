@@ -6,6 +6,7 @@ import sys
 import datetime
 import time
 import random
+import os
 
 class Proceso(object):
 
@@ -170,7 +171,7 @@ def input(consola):
 	global lastconsola
 	#print "lastconsola " + lastconsola
 	#print "consola " + consola
-	if( (not(consola.value == lastconsola) or (lastconsola == "top"))) :
+	if( (not(consola.value == lastconsola) or (lastconsola == "top") or (lastconsola == "agenda") or (lastconsola == "historial"))) :
 	    try :
 	        variable = consola.value.split(";")
 	    except :
@@ -352,9 +353,11 @@ def funcion(num,p,consola):
 					del ejecutandose[2][0]
 
 			time.sleep(deltaT)
-
+			
+			os.system(['clear','cls'][os.name == 'nt'])
+			print "Tiempo: "+str(datetime.datetime.fromtimestamp(tiempoMaquina))
 		tiempoMaquina+=1
-		print "Tiempo: "+str(datetime.datetime.fromtimestamp(tiempoMaquina))
+		#print "Tiempo: "+str(datetime.datetime.fromtimestamp(tiempoMaquina))
 
 
 
