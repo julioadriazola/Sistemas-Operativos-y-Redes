@@ -6,6 +6,7 @@ import sys
 import datetime
 import time
 import random
+import os
 
 class Proceso(object):
 
@@ -68,6 +69,8 @@ class Proceso(object):
 		return self.tipo_proceso
 	def getPrioridad(self):
 		return self.prioridad_base
+	def incPrioridad(self):
+		self.prioridad_base += 1
 	def getNumCola(self):
 		return self.numCola
 	def getDuracion(self):
@@ -170,7 +173,7 @@ def input(consola):
 	global lastconsola
 	#print "lastconsola " + lastconsola
 	#print "consola " + consola
-	if( (not(consola.value == lastconsola) or (lastconsola == "top"))) :
+	if( (not(consola.value == lastconsola) or (lastconsola == "top") or (lastconsola == "agenda")  or (lastconsola == "historial") )) :
 	    try :
 	        variable = consola.value.split(";")
 	    except :
@@ -196,6 +199,16 @@ def input(consola):
 
 	    elif(consola.value == "salir"):
 			sys.exit(0)
+
+	    if(consola.value == "dhistorial"):
+	    	try:
+	    		open("Historial.txt","w").close()
+	    		open("SMS.txt","w").close()
+	    		print "Historial Borrado"
+	    	except:
+	    		print "No se pudo borrar historial"
+
+
 	    elif(consola.value=="agenda"):
 	        print "Agenda"
 	        f = open("Procesos.txt","r")
@@ -211,6 +224,7 @@ def input(consola):
 	        		i+=1
 	        #aqui hay que imprimir la agenda y despues agregar la llamada elegida a la clase proceso
 	        variable=""
+	        
 	    elif(consola.value=="historial"):
 	        #aqui hay que imprimir el archivo de historial de llamadas y mensajes
 	        print "Historial de Mensajes"
@@ -282,7 +296,7 @@ def topfunction():
 	else:
 		print "Running: "
 		for j in range(0,len(ejecutandose[2])):
-			print str(ejecutandose[2][j].getNombre()) + " | " +str(ejecutandose[2][j].getNumCola())
+			print str(ejecutandose[2][j].getNombre()) + " | " +str(ejecutandose[2][j].getNumCola()) + " : " + str(ejecutandose[2][j].getPrioridad())
 
 
 
@@ -346,15 +360,24 @@ def funcion(num,p,consola):
 
 
 				elif(ejecutandose[2]):
+
+					for x in range(1,len(ejecutandose[2])):
+						ejecutandose[2][x].incPrioridad()
+
+
 					ejecutandose[2][0].ejecutarAccion(deltaT)
 					if (ejecutandose[2][0].isAlive()):
 						ejecutandose[2].append(ejecutandose[2][0])
 					del ejecutandose[2][0]
 
+					ejecutandose[2] = sorted(ejecutandose[2], key=lambda Proceso: Proceso.prioridad_base)
+					ejecutandose[2].reverse()
 			time.sleep(deltaT)
-
+			
+			os.system(['clear','cls'][os.name == 'nt'])
+			print "Tiempo: "+str(datetime.datetime.fromtimestamp(tiempoMaquina))
 		tiempoMaquina+=1
-		print "Tiempo: "+str(datetime.datetime.fromtimestamp(tiempoMaquina))
+		#print "Tiempo: "+str(datetime.datetime.fromtimestamp(tiempoMaquina))
 
 
 
