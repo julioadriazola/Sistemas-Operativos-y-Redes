@@ -11,13 +11,17 @@ archivos:
 	enviados y recibidos.
 	2.3. "Procesos.txt" : Información con respecto a todos
 	los procesos de prioridad 3.
-3. Los comandos que son aceptados por Consola son:
+3. Para ingresar un comando, simplemente se debe escribir
+hasta terminar, y apretar enter. Los comandos que son 
+aceptados por Consola son:
 	3.1. "top" : simula la función top de Unix, muestra la
 	lista de procesos en ejecución, ordenados por prioridad
 	(primero las llamadas, luego los mensajes y por último
 	todos los demás).
 	Además separa entre el que está haciendo uso de la CPU
-	en ese momento y el(los) que está(n) en modo "waiting".
+	en ese momento y el(los) que está(n) en modo "Waiting"
+	(Debido a que un proceso con mayor prioridad, como una
+	llamada, está siendo ejecutado).
 	3.2. "agenda" : muestra todos los contactos 
 	almacenados en la memoria, para que uno pueda ser
 	elegido y llamado, por el comando "call i", con i:

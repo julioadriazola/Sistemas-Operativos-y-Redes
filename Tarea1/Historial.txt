@@ -1,3 +1,2 @@
-Llamada recibida de: 2277567	Fecha: 2013-09-10 14:59:39	Duracion: 15
-Llamada hecha a: 2277567	Fecha: 2013-09-10 14:59:50	Duracion: 10
-Llamada recibida de: 2277567	Fecha: 2013-09-10 15:00:21	Duracion: 15
+Llamada hecha a: 2277567	Fecha: 2013-09-10 21:34:45	Duracion: 3
+Llamada recibida de: 2277567	Fecha: 2013-09-10 21:34:46	Duracion: 15
