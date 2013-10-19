@@ -6,7 +6,7 @@ _dir_file_to_adress=1
 _ram_size=1024
 _hdd_size=512
 _ram_folder='./ram/'
-_hdd_folder='./hdd/'
+_hdd_folder='./disco/'
 
 _ram_administrator=list()
 for i in range(1,ram_blocks+1):
