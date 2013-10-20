@@ -1,0 +1,9 @@
+    Create a new dictionary with keys from seq and values set to value.
+
+    fromkeys() is a class method that returns a new dictionary. value defaults to None.
+
+    New in version 2.3.
+
+get(key[, default])
+
+    Return the value for key if key is in

@@ -1,0 +1,20 @@
+
+d[key] = value
+
+    Set d[key] to value.
+
+del d[key]
+
+    Remove d[key] from d. Raises a KeyError if key is not in the map.
+
+key in d
+
+    Return True if d has a key key, else False.
+
+    New in version 2.2.
+
+key not in d
+
+    Equivalent to not key in d.
+
+    New in version 2.2.

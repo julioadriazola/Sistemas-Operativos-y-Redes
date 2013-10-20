@@ -1,0 +1,14 @@
+
+iter(d)
+
+    Return an iterator over the keys of the dictionary. This is a shortcut for iterkeys().
+
+clear()
+
+    Remove all items from the dictionary.
+
+copy()
+
+    Return a shallow copy of the dictionary.
+
+fromkeys(seq[, value])
