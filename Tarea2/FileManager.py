@@ -125,7 +125,7 @@ class bloqueRAM(object):
 		_lru=_lru+1
 		# print "lru: "+str(_lru)+ " vs lru_objeto: "+ str(self._lru)
 
-	def addBloqueRAM(self,content,dir_hdd1,dir_hdd2,_type):
+	def addBloqueRAM(self,content,dir_hdd1,dir_hdd2,_type,refresh):
 		if(_type==2):
 			self._dir_hdd1=dir_hdd1
 			self._dir_hdd2=dir_hdd2
@@ -147,23 +147,137 @@ class bloqueRAM(object):
 				f.truncate()
 				f.write(self._info)
 				f.close()
+		if(refresh):
+			self.refreshLRU()
+		else:
+			self._lru=-1
 
-		self.refreshLRU()
 
 
-
-
-	def refreshContent(self):
+	def refreshContent(self,content):
 		if(self._type==1):
 			global _directorio
 			tmp=[]
 			for key in _directorio:
 				tmp.append(key+" "+str(_directorio[key]))
 			self._info='\n'.join(tmp)
+		if(self._type==2):
+			self._info='\n'.join(content)
 		if(self._type==4):
 			global _vacio
 			self._info=''.join(str(x) for x in _vacio)
 			# print "|--"+self._info+"--|"
+
+
+
+def editFile(file_name,add_content):
+	global _directorio
+	if(file_name in _directorio):
+		#buscamos inodo
+		dir_file_name=_directorio[file_name]
+
+		global _ram
+		encontrado=False
+		dir_ram_rep=-1
+		for i in range (1,len(_ram)):
+			#ver si inodo esta en ram
+			if(_ram[i]._dir_hdd1==dir_file_name and _ram[i]._type==2):
+				dir_ram_rep=i
+				encontrado=True
+		#si no esta en ram, se le asigna una pagina y se lee el bloque de disco y se trae a ram
+		if(not encontrado):
+			dir_ram_rep=pageReplacement()
+			_ram[dir_ram_rep].leerBloqueDisco(dir_file_name,-1,2)
+
+		tmp=_ram[dir_ram_rep]._info.split("\n") #dir_ram_rep dir de inodo en ram
+
+		largo_en_bloques=len(tmp)-3 #Le quitamos los 2 headers y el ultimo archivo que no sabemos si está completo
+		i=len(tmp)-1 #el ultimo bloque de la wea
+		sub_encontrado=False
+
+		for j in range (1,len(_ram)):
+			if((_ram[j]._dir_hdd1==int(tmp[i]) or _ram[j]._dir_hdd2==int(tmp[i])) and _ram[j]._type==3):
+				sub_encontrado=True
+				_ram[j].saveToDisk()
+				_ram[j].addBloqueRAM("",-1,-1,-1,False)
+
+		dir_ram_sub_rep=pageReplacement()
+		_ram[dir_ram_sub_rep].leerBloqueDisco(int(tmp[i]),-1,3)
+
+
+		tamano_archivo=largo_en_bloques*512+len(add_content)+len(_ram[dir_ram_sub_rep]._info)
+		if(tamano_archivo>1024*5):
+			print "No se puede agregar el contenido: Archivo excede tamaño máximo (5KB)"
+		else:
+			num_bloq_hdd=0
+			tam=len(add_content)+len(_ram[dir_ram_sub_rep]._info)
+			if(tam%512==0):
+				num_bloq_hdd=int(tam/512)#Numero de bloques en disco
+			else:
+				num_bloq_hdd=int(tam/512)+1
+			if(tam%1024==0):
+				num_bloq_ram=int(tam/1024) #Numero de bloques en disco
+			else:
+				num_bloq_ram=int(tam/1024)+1 #Funcion Techo 
+
+
+
+			if(num_bloq_hdd-1>_num_vacios):
+				print "Sorry pero tu disco está lleno de weas, no cabe este archivo en disco. Borre el porno"
+			else:
+
+				lista_bloques_por_ocupar=[]
+				lista_bloques_por_ocupar.append(_ram[dir_ram_sub_rep]._dir_hdd1)
+				for i in range(0,num_bloq_hdd-1): #Sin el bloque que ya estoy ocupando
+					lista_bloques_por_ocupar.append(nextEmpty(True))
+				
+
+				tmp[len(tmp)-1]=str(lista_bloques_por_ocupar[0]) #La ultima linea del inodo la actualizamos
+				for i in range (1,len(lista_bloques_por_ocupar)): #Le agregamos el resto de las nuevas lineas
+					tmp.append(str(lista_bloques_por_ocupar[i]))
+				
+				_ram[dir_ram_rep].refreshContent(tmp)
+
+				content=_ram[dir_ram_sub_rep]._info+add_content
+
+				lista_de_ram=[]
+				for i in range(0,num_bloq_ram):
+					next_p=0
+					if(i==0):
+						next_p=dir_ram_sub_rep
+					else:
+						next_p=pageReplacement()
+					lista_de_ram.append(next_p)
+					contenido=''
+					bloq1=-1
+					bloq2=-1
+					if(len(content)>=(i+1)*1024):
+						contenido=content[i*1024:(i+1)*1024]
+						bloq1=lista_bloques_por_ocupar[i*2]
+						bloq2=lista_bloques_por_ocupar[i*2+1]
+					else:
+						contenido=content[i*1024:len(content)]
+						if(len(content)-i*1024>512):
+							bloq1=lista_bloques_por_ocupar[i*2]
+							bloq2=lista_bloques_por_ocupar[i*2+1]
+						else:
+							bloq1=lista_bloques_por_ocupar[i*2]
+
+					_ram[next_p].addBloqueRAM(contenido,bloq1,bloq2,3,True)
+
+				_ram[1].refreshContent(1)
+				_ram[1].saveToDisk()
+				_ram[2].refreshContent(1)
+				_ram[2].saveToDisk()
+				_ram[dir_ram_rep].saveToDisk()
+				for i in range (0,len(lista_de_ram)):
+					_ram[lista_de_ram[i]].saveToDisk()
+
+
+
+
+
+
 
 def deleteFile(file_name):
 	global _directorio, _vacio, _ram
@@ -191,9 +305,9 @@ def deleteFile(file_name):
 			_vacio[int(tmp[i])-1]=0
 			print tmp[i]+": "+str(_vacio[int(tmp[i])-1])
 
-		_ram[1].refreshContent()
+		_ram[1].refreshContent(1)
 		_ram[1].saveToDisk()
-		_ram[2].refreshContent()
+		_ram[2].refreshContent(1)
 		_ram[2].saveToDisk()
 
 		print file_name+" borrado exitosamente"
@@ -286,7 +400,7 @@ def createFile(content,file_name):
 				contenido_inodo="Tiempo creado\nTiempo editado\n"+'\n'.join(str(x) for x in lista_bloques_por_ocupar)
 				# print "|--"+contenido_inodo+"--|"
 
-				_ram[ram_page].addBloqueRAM(contenido_inodo,next_empty_hdd,-1,2)
+				_ram[ram_page].addBloqueRAM(contenido_inodo,next_empty_hdd,-1,2,True)
 
 
 				lista_de_ram=[]
@@ -308,10 +422,10 @@ def createFile(content,file_name):
 						else:
 							bloq1=lista_bloques_por_ocupar[i*2]
 
-					_ram[next_p].addBloqueRAM(contenido,bloq1,bloq2,3)
-				_ram[1].refreshContent()
+					_ram[next_p].addBloqueRAM(contenido,bloq1,bloq2,3,True)
+				_ram[1].refreshContent(1)
 				_ram[1].saveToDisk()
-				_ram[2].refreshContent()
+				_ram[2].refreshContent(1)
 				_ram[2].saveToDisk()
 				_ram[ram_page].saveToDisk()
 				for i in range (0,len(lista_de_ram)):
@@ -401,9 +515,11 @@ def __begin(ram_blocks,hdd_blocks):
 #Cuando se prende el sistema
 __begin(20,800)
 
-createFile("","adsad")
+createFile("1","Hola")
 
-createFile("k3t09itqieojgoeqihg\n\nsdasdsad\nojda i hqeojoqj ogjqogh qghqogjqei gjqigpqoj gpqgpoid","adsad1")
+editFile("Hola","Vamos a fallar. Sorry pero tu disco está lleno de weas, no cabe este archivo en disco. Borre el porno\n")
 
-deleteFile("adsad1")
-deleteFile("oli")
+# createFile("k3t09itqieojgoeqihg\n\nsdasdsad\nojda i hqeojoqj ogjqogh qghqogjqei gjqigpqoj gpqgpoid","adsad1")
+
+# deleteFile("adsad1")
+# deleteFile("oli")
