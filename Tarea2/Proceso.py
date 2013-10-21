@@ -1,4 +1,4 @@
-from multiprocessing import Process, Lock
+﻿from multiprocessing import Process, Lock
 from multiprocessing.sharedctypes import Value, Array
 import time
 import math
@@ -7,6 +7,7 @@ import datetime
 import time
 import random
 import os
+import FileManager as fm
 
 class Proceso(object):
 
@@ -94,11 +95,16 @@ class Proceso(object):
 				llamada = 'Llamada recibida de: '
 			data = self.opciones[0] +'\t'+ 'Fecha: ' + str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)) +'\t'+ 'Duracion: ' + self.opciones[1] +'\n'
 			if (not(self.lasth) or not(self.lasth == llamada+data)):
-				try:
-					fh = open("Historial.txt", "a")
-					fh.write(llamada+data)
-				finally:
-					fh.close()
+				# try:
+				if(fm.fileExist("Historial.txt")):
+					fm.editFile("Historial.txt",llamada+data,str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)))
+				else:
+					fm.createFile("Historial.txt",llamada+data,str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)))
+					#EditFile
+				# 	fh = open("Historial.txt", "a")
+				# 	fh.write(llamada+data)
+				# finally:
+				# 	fh.close()
 			self.lasth = llamada+data
 		elif(self.tipo_proceso == 3 or self.tipo_proceso == 4):
 			if self.tipo_proceso == 3:
@@ -106,11 +112,10 @@ class Proceso(object):
 			else:
 				sms = 'Mensaje recibido de: ' +'\t'+ self.opciones[0] +'\t'+ 'Fecha: ' + str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)) +'\n' + self.opciones[1] + '\n'
 			if(not(self.lasts) or not (self.lasts == sms)):
-				try:
-					fs = open("SMS.txt", "a")
-					fs.write(sms)
-				finally:
-					fs.close()
+				if(fm.fileExist("SMS.txt")):
+					fm.editFile("SMS.txt",sms,str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)))
+				else:
+					fm.createFile("SMS.txt",sms,str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)))
 			self.lasts = sms
 		elif(self.tipo_proceso >= 5 and self.tipo_proceso <= 10):
 			if(self.tipo_proceso == 5):
@@ -126,11 +131,10 @@ class Proceso(object):
 			elif(self.tipo_proceso == 10):
 				accion = 'Escuchar musica' +'\t'+'\t'+ 'Duracion: '+ self.opciones[0] +'\n'
 			if(not(self.lastp) or not(self.lastp == accion)):
-				try:
-					fp = open("Procesos.txt", "a")
-					fp.write(accion)
-				finally:
-					fp.close()
+				if(fm.fileExist("Procesos.txt")):
+					fm.editFile("Procesos.txt",accion,str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)))
+				else:
+					fm.createFile("Procesos.txt",accion,str(datetime.datetime.fromtimestamp(self.fecha_ejecucion)))
 			self.lastp = accion
 			
 			
@@ -201,19 +205,16 @@ def input(consola):
 			sys.exit(0)
 
 	    if(consola.value == "dhistorial"):
-	    	try:
-	    		open("Historial.txt","w").close()
-	    		open("SMS.txt","w").close()
-	    		print "Historial Borrado"
-	    	except:
-	    		print "No se pudo borrar historial"
+	   		fm.deleteFile("Historial.txt")
+	   		fm.deleteFile("SMS.txt")
+	   		print "Historial borrado exitosamente"
 
 
 	    elif(consola.value=="agenda"):
 	        print "Agenda"
-	        f = open("Procesos.txt","r")
-	        lines = f.readlines()
-	        f.close()
+	        lines_bruto= fm.readFileTo("Procesos.txt")
+	        # print lines_bruto
+	        lines= lines_bruto.split('\n')
 
 	        i=0
 	        for l in range(0,len(lines)):
@@ -228,17 +229,15 @@ def input(consola):
 	    elif(consola.value=="historial"):
 	        #aqui hay que imprimir el archivo de historial de llamadas y mensajes
 	        print "Historial de Mensajes"
-	        f = open("SMS.txt","r")
-	        lines = f.readlines()
-	        f.close()
+	        lines_bruto= fm.readFileTo("SMS.txt")
+	        lines= lines_bruto.split('\n')
 
 	        for l in range(0,len(lines)):
 	        	print lines[l].strip()
 
 	        print "Historial de Llamadas"
-	        f = open("Historial.txt","r")
-	        lines = f.readlines()
-	        f.close()
+	        lines_bruto= fm.readFileTo("Historial.txt")
+	        lines= lines_bruto.split('\n')
 
 	        for l in range(0,len(lines)):
 	        	print lines[l].strip()
@@ -246,12 +245,33 @@ def input(consola):
 	        variable=""
 	    elif(consola.value == "top"):
 			topfunction()
+
+	    elif(consola.value[0:4] == "copy"):
+	    	opcion = consola.value[5:].strip()
+	    	if(len(opcion)>0):
+	    		if (os.path.isfile("./"+opcion)):
+	    			f = open("./"+opcion,'rw+')
+	    			text = f.read()
+	    			f.close()
+	    			if(fm.createFile(opcion,text,str(datetime.datetime.fromtimestamp(tiempoMaquina)))):
+	    				print "Archivo copiado con éxito. Para verlo ejecute: open "+opcion
+	    		else:
+	    			print "La ruta del archivo que menciona no está en la carpeta raiz"
+
+	    elif(consola.value[0:4] == "open"):
+	    	opcion = consola.value[5:].strip()
+	    	if(len(opcion)>0):
+	    		if (fm.fileExist(opcion)):
+	    			print "Archivo:"
+	    			print "|--INICIO--|\n"+fm.readFileTo(opcion)+"\n|--TERMINO--|"
+	    		else:
+	    			print "Error 404: File not found :D"
+
 	    elif(consola.value[0:4] == "call"):
 			opcion = int(consola.value[5:].strip())
 
-			f = open("Procesos.txt","r")
-			lines = f.readlines()
-			f.close()
+			lines_bruto= fm.readFileTo("Procesos.txt")
+			lines= lines_bruto.split('\n')
 
 			i=0
 			for l in range(0,len(lines)):
@@ -267,6 +287,23 @@ def input(consola):
 						procesos.append(p)
 						procesos = sorted(procesos, key=lambda Proceso: Proceso.fecha_ejecucion)
 					i+=1
+	    elif(consola.value[0:3] == "del"):
+			opcion = consola.value[4:].strip()
+			if(len(opcion)>0):
+				if(fm.fileExist(opcion)):
+					fm.deleteFile(opcion)
+					print "Archivo borrado con éxito"
+				else:
+					print "Error 404: File not found :D"
+
+		# elif(consola.value[0:3] == "del"):
+		# 	opcion = consola.value[4:].strip()
+		# 	if(len(opcion)>0):
+		# 		if (fm.fileExist(opcion)):
+		# 			fm.deleteFile(opcion)
+		# 			print "Archivo borrado con éxito"
+		# 		else:
+		# 			print "Error 404: File not found :D"
 	lastconsola = consola.value
 	
 
@@ -390,6 +427,8 @@ texto = ""
 while(texto <> "salir"):
 	texto = raw_input("")
 	consola.value = texto
+
+
 # for p in procesos:
 # 	p.writeInfo()
 

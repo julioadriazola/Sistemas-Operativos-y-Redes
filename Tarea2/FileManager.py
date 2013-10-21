@@ -170,7 +170,7 @@ class bloqueRAM(object):
 
 
 
-def editFile(file_name,add_content):
+def editFile(file_name,add_content,fecha):
 	global _directorio
 	if(file_name in _directorio):
 		#buscamos inodo
@@ -223,7 +223,7 @@ def editFile(file_name,add_content):
 
 
 			if(num_bloq_hdd-1>_num_vacios):
-				print "Sorry pero tu disco está lleno de weas, no cabe este archivo en disco. Borre el porno"
+				print "Sorry pero tu disco está lleno, no cabe este archivo en disco."
 			else:
 
 				lista_bloques_por_ocupar=[]
@@ -231,7 +231,7 @@ def editFile(file_name,add_content):
 				for i in range(0,num_bloq_hdd-1): #Sin el bloque que ya estoy ocupando
 					lista_bloques_por_ocupar.append(nextEmpty(True))
 				
-
+				tmp[1]=fecha
 				tmp[len(tmp)-1]=str(lista_bloques_por_ocupar[0]) #La ultima linea del inodo la actualizamos
 				for i in range (1,len(lista_bloques_por_ocupar)): #Le agregamos el resto de las nuevas lineas
 					tmp.append(str(lista_bloques_por_ocupar[i]))
@@ -286,6 +286,7 @@ def deleteFile(file_name):
 		del _directorio[file_name]
 
 		dir_ram_rep=-1
+		encontrado=False
 		for i in range (1,len(_ram)):
 			#ver si inodo esta en ram
 			if(_ram[i]._dir_hdd1==dir_file_name and _ram[i]._type==2):
@@ -296,23 +297,77 @@ def deleteFile(file_name):
 			dir_ram_rep=pageReplacement()
 			_ram[dir_ram_rep].leerBloqueDisco(dir_file_name,-1,2)
 
-		_vacio[dir_file_name-1]=0
+		_vacio[int(dir_file_name)-1]=0
 
 		tmp=_ram[dir_ram_rep]._info.split("\n")
 
 		for i in range (2,len(tmp)):
-			print tmp[i]+": "+str(_vacio[int(tmp[i])-1])
+			# print tmp[i]+": "+str(_vacio[int(tmp[i])-1])
 			_vacio[int(tmp[i])-1]=0
-			print tmp[i]+": "+str(_vacio[int(tmp[i])-1])
+			f = open(_hdd_folder+tmp[i],'rw+')
+			f.truncate()
+			f.close()
+			for j in range (1,len(_ram)):
+				#ver si inodo esta en ram
+				if((_ram[j]._dir_hdd1==int(tmp[i]) or _ram[j]._dir_hdd2==int(tmp[i])) and _ram[j]._type==3):
+					_ram[j].addBloqueRAM("",-1,-1,-1,False)
 
+		_ram[int(dir_file_name)].addBloqueRAM("",-1,-1,-1,False) #Lo borramos también de RAM
 		_ram[1].refreshContent(1)
 		_ram[1].saveToDisk()
 		_ram[2].refreshContent(1)
 		_ram[2].saveToDisk()
 
-		print file_name+" borrado exitosamente"
-	else:
-		print "El archivo "+file_name+" no existe"
+		# print file_name+" borrado exitosamente"
+	# else:
+	# 	print "El archivo "+file_name+" no existe"
+
+
+def readFileTo(file_name):
+	global _directorio
+	output=''
+	if(file_name in _directorio):
+		#buscamos inodo
+		dir_file_name=_directorio[file_name]
+
+		global _ram
+		encontrado=False
+		dir_ram_rep=-1
+		for i in range (1,len(_ram)):
+			#ver si inodo esta en ram
+			if(_ram[i]._dir_hdd1==dir_file_name and _ram[i]._type==2):
+				dir_ram_rep=i
+				encontrado=True
+		#si no esta en ram, se le asigna una pagina y se lee el bloque de disco y se trae a ram
+		if(not encontrado):
+			dir_ram_rep=pageReplacement()
+			_ram[dir_ram_rep].leerBloqueDisco(dir_file_name,-1,2)
+
+		tmp=_ram[dir_ram_rep]._info.split("\n")
+
+		for i in range (2,len(tmp)):
+			if(i%2==0):
+				if(i+1<len(tmp)):
+					sub_encontrado=False
+					for j in range (1,len(_ram)):
+						if(_ram[j]._dir_hdd1==int(tmp[i]) and _ram[j]._dir_hdd2==int(tmp[i+1]) and _ram[j]._type==3):
+							output=output+_ram[j]._info
+							sub_encontrado=True
+					if(not sub_encontrado):
+						dir_ram_sub_rep=pageReplacement()
+						_ram[dir_ram_sub_rep].leerBloqueDisco(int(tmp[i]),int(tmp[i+1]),3)
+						output=output+ _ram[dir_ram_sub_rep]._info
+				else:
+					sub_encontrado=False
+					for j in range (1,len(_ram)):
+						if(_ram[j]._dir_hdd1==int(tmp[i]) and _ram[j]._type==3):
+							output=output+ _ram[j]._info
+							sub_encontrado=True
+					if(not sub_encontrado):
+						dir_ram_sub_rep=pageReplacement()
+						_ram[dir_ram_sub_rep].leerBloqueDisco(int(tmp[i]),-1,3)
+						output=output+ _ram[dir_ram_sub_rep]._info
+	return output
 
 
 
@@ -365,7 +420,7 @@ def readFile(file_name):
 		return False
 
 
-def createFile(content,file_name):
+def createFile(file_name,content,fecha):
 	global _directorio,_num_vacios
 	if(file_name in _directorio):
 		print "Lamentamos el inconveniente, el nombre del archivo ya existe :("
@@ -386,7 +441,7 @@ def createFile(content,file_name):
 
 
 			if(num_bloq_hdd>_num_vacios):
-				print "Sorry pero tu disco está lleno de weas, no cabe este archivo en disco. Borre el porno"
+				print "Sorry pero tu disco está lleno, no cabe este archivo en disco"
 			else:
 				next_empty_hdd=nextEmpty(True)
 				_directorio[file_name]=next_empty_hdd
@@ -397,7 +452,7 @@ def createFile(content,file_name):
 					lista_bloques_por_ocupar.append(nextEmpty(True))
 					# print "Bloques a usar: "+str(lista_bloques_por_ocupar[i])
 
-				contenido_inodo="Tiempo creado\nTiempo editado\n"+'\n'.join(str(x) for x in lista_bloques_por_ocupar)
+				contenido_inodo=fecha+"\n"+fecha+"\n"+'\n'.join(str(x) for x in lista_bloques_por_ocupar)
 				# print "|--"+contenido_inodo+"--|"
 
 				_ram[ram_page].addBloqueRAM(contenido_inodo,next_empty_hdd,-1,2,True)
@@ -430,7 +485,12 @@ def createFile(content,file_name):
 				_ram[ram_page].saveToDisk()
 				for i in range (0,len(lista_de_ram)):
 					_ram[lista_de_ram[i]].saveToDisk()
+				return True
+	return False
 
+
+def fileExist(file_name):
+	return file_name in _directorio
 
 def nextEmpty(replace):
 	global _vacio
@@ -469,6 +529,7 @@ def __begin(ram_blocks,hdd_blocks):
 			if(len(text)>_ram_size):
 				f = open(_ram_folder+str(i),'rw+')
 				f.truncate(_ram_size)
+				f.close()
 		else:
 			open(_ram_folder+str(i),'a').close()
 
@@ -480,6 +541,7 @@ def __begin(ram_blocks,hdd_blocks):
 			if(len(text)>_hdd_size):
 				f = open(_hdd_folder+str(i),'rw+')
 				f.truncate(_hdd_size)
+				f.close()
 		else:
 			open(_hdd_folder+str(i),'a').close()
 
@@ -515,10 +577,10 @@ def __begin(ram_blocks,hdd_blocks):
 #Cuando se prende el sistema
 __begin(20,800)
 
-createFile("1","Hola")
+# createFile("1","Hola")
 
-editFile("Hola","Vamos a fallar. Sorry pero tu disco está lleno de weas, no cabe este archivo en disco. Borre el porno\n")
-
+# editFile("Hola","Vamos a fallar. Sorry pero tu disco está lleno de weas, no cabe este archivo en disco. Borre el porno\n")
+# print "|--"+readFileTo("Hola")+"--|"
 # createFile("k3t09itqieojgoeqihg\n\nsdasdsad\nojda i hqeojoqj ogjqogh qghqogjqei gjqigpqoj gpqgpoid","adsad1")
 
 # deleteFile("adsad1")
