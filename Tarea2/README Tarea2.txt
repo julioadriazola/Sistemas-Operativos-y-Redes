@@ -2,6 +2,7 @@
 			TAREA 2 - IIC2333
 			     GRUPO 7
 
+0. El archivo a ejecutar es Proceso.py
 1. El archivo de ejecución debe llamarse "example.txt" y
 debe ubicarse en la raiz del proyecto
 2. La Memoria del celular está simulada por los siguientes
