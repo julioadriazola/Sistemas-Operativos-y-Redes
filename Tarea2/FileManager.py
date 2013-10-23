@@ -181,7 +181,7 @@ def editFile(file_name,add_content,fecha):
 		dir_ram_rep=-1
 		for i in range (1,len(_ram)):
 			#ver si inodo esta en ram
-			if(_ram[i]._dir_hdd1==dir_file_name and _ram[i]._type==2):
+			if(_ram[i]._dir_hdd1==int(dir_file_name) and _ram[i]._type==2):
 				dir_ram_rep=i
 				encontrado=True
 		#si no esta en ram, se le asigna una pagina y se lee el bloque de disco y se trae a ram
@@ -289,7 +289,7 @@ def deleteFile(file_name):
 		encontrado=False
 		for i in range (1,len(_ram)):
 			#ver si inodo esta en ram
-			if(_ram[i]._dir_hdd1==dir_file_name and _ram[i]._type==2):
+			if(_ram[i]._dir_hdd1==int(dir_file_name) and _ram[i]._type==2):
 				dir_ram_rep=i
 				encontrado=True
 		#si no esta en ram, se le asigna una pagina y se lee el bloque de disco y se trae a ram
@@ -335,7 +335,7 @@ def readFileTo(file_name):
 		dir_ram_rep=-1
 		for i in range (1,len(_ram)):
 			#ver si inodo esta en ram
-			if(_ram[i]._dir_hdd1==dir_file_name and _ram[i]._type==2):
+			if(_ram[i]._dir_hdd1==int(dir_file_name) and _ram[i]._type==2):
 				dir_ram_rep=i
 				encontrado=True
 		#si no esta en ram, se le asigna una pagina y se lee el bloque de disco y se trae a ram
@@ -382,7 +382,7 @@ def readFile(file_name):
 		dir_ram_rep=-1
 		for i in range (1,len(_ram)):
 			#ver si inodo esta en ram
-			if(_ram[i]._dir_hdd1==dir_file_name and _ram[i]._type==2):
+			if(_ram[i]._dir_hdd1==int(dir_file_name) and _ram[i]._type==2):
 				dir_ram_rep=i
 				encontrado=True
 		#si no esta en ram, se le asigna una pagina y se lee el bloque de disco y se trae a ram
